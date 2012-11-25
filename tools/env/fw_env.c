@@ -119,7 +119,7 @@ static unsigned char active_flag = 1;
 /* obsolete_flag must be 0 to efficiently set it on NOR flash without erasing */
 static unsigned char obsolete_flag = 0;
 
-#define DEFAULT_ENV_INSTANCE_STATIC
+//#define DEFAULT_ENV_INSTANCE_STATIC
 #include <env_default.h>
 
 static int flash_io (int mode);

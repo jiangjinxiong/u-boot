@@ -36,15 +36,39 @@ static char default_environment[] = {
 #else
 const uchar default_environment[] = {
 #endif
+
+#ifdef	MTDPARTS_DEFAULT
+	"mtdparts="	MTDPARTS_DEFAULT		               "\0"
+#endif
+
 #ifdef	CONFIG_BOOTARGS
-	"bootargs="	CONFIG_BOOTARGS			"\0"
+	"bootargs="	CONFIG_BOOTARGS			               "\0"
 #endif
+#ifdef	CONFIG_BOOTARGS_NFS
+	"bootargs_nfs="	CONFIG_BOOTARGS_NFS		           "\0"
+#endif
+#ifdef	CONFIG_BOOTARGS_ROOTFS1
+	"bootargs_rootfs1="	CONFIG_BOOTARGS_ROOTFS1		   "\0"
+#endif
+#ifdef	CONFIG_BOOTARGS_ROOTFS2
+	"bootargs_rootfs2="	CONFIG_BOOTARGS_ROOTFS2		   "\0"
+#endif
+
 #ifdef	CONFIG_BOOTCOMMAND
-	"bootcmd="	CONFIG_BOOTCOMMAND		"\0"
+	"bootcmd="	CONFIG_BOOTCOMMAND		               "\0"
 #endif
+#ifdef	CONFIG_BOOTCOMMAND_KERNEL1
+	"bootcmd_kernel1="	CONFIG_BOOTCOMMAND_KERNEL1	   "\0"
+#endif
+#ifdef	CONFIG_BOOTCOMMAND_KERNEL2
+	"bootcmd_kernel2="	CONFIG_BOOTCOMMAND_KERNEL2	   "\0"
+#endif
+
+/*
 #ifdef	CONFIG_RAMBOOTCOMMAND
 	"ramboot="	CONFIG_RAMBOOTCOMMAND		"\0"
 #endif
+*/
 #ifdef	CONFIG_NFSBOOTCOMMAND
 	"nfsboot="	CONFIG_NFSBOOTCOMMAND		"\0"
 #endif
@@ -111,9 +135,11 @@ const uchar default_environment[] = {
 #ifdef	CONFIG_CLOCKS_IN_MHZ
 	"clocks_in_mhz=1\0"
 #endif
+/*
 #if defined(CONFIG_PCI_BOOTDELAY) && (CONFIG_PCI_BOOTDELAY > 0)
 	"pcidelay="	__stringify(CONFIG_PCI_BOOTDELAY)"\0"
 #endif
+
 #ifdef	CONFIG_ENV_VARS_UBOOT_CONFIG
 	"arch="		CONFIG_SYS_ARCH			"\0"
 	"cpu="		CONFIG_SYS_CPU			"\0"
@@ -126,6 +152,8 @@ const uchar default_environment[] = {
 	"soc="		CONFIG_SYS_SOC			"\0"
 #endif
 #endif
+*/
+
 #ifdef	CONFIG_EXTRA_ENV_SETTINGS
 	CONFIG_EXTRA_ENV_SETTINGS
 #endif

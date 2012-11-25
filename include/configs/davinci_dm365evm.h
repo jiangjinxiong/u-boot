@@ -20,6 +20,8 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+#define CONFIG_HOSTNAME		TFC_IPNC
+
 /* Spectrum Digital TMS320DM365 EVM board */
 #define DAVINCI_DM365EVM
 
@@ -33,6 +35,7 @@
 #define CONFIG_SYS_HZ_CLOCK		24000000	/* timer0 freq */
 #define CONFIG_SYS_HZ			1000
 #define CONFIG_SOC_DM365
+#define CONFIG_DISPLAY_CPUINFO
 
 /* Memory Info */
 #define CONFIG_NR_DRAM_BANKS		1
@@ -45,14 +48,15 @@
 #define CONFIG_SYS_NS16550_REG_SIZE	-4
 #define CONFIG_SYS_NS16550_COM1		0x01c20000
 #define CONFIG_SYS_NS16550_CLK		CONFIG_SYS_HZ_CLOCK
+#define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 #define CONFIG_CONS_INDEX		1
 #define CONFIG_BAUDRATE			115200
 
 /* EEPROM definitions for EEPROM on DM365 EVM */
-#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN		2
-#define CONFIG_SYS_I2C_EEPROM_ADDR		0x50
-#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS	6
-#define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS	20
+//#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN		2
+//#define CONFIG_SYS_I2C_EEPROM_ADDR		0x50
+//#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS	6
+//#define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS	20
 
 /* Network Configuration */
 #define CONFIG_DRIVER_TI_EMAC
@@ -64,8 +68,8 @@
 #define CONFIG_NET_RETRY_COUNT	10
 
 /* I2C */
-#define CONFIG_HARD_I2C
-#define CONFIG_DRIVER_DAVINCI_I2C
+#undef CONFIG_HARD_I2C
+#undef CONFIG_DRIVER_DAVINCI_I2C
 #define CONFIG_SYS_I2C_SPEED		400000
 #define CONFIG_SYS_I2C_SLAVE		0x10	/* SMBus host address */
 
@@ -74,13 +78,14 @@
 #define CONFIG_SYS_NAND_CS		2
 #define CONFIG_SYS_NAND_USE_FLASH_BBT
 #define CONFIG_SYS_NAND_4BIT_HW_ECC_OOBFIRST
+#undef CONFIG_SYS_NAND_HW_ECC
 #define CONFIG_SYS_NAND_PAGE_2K
 
 #define CONFIG_SYS_NAND_LARGEPAGE
 #define CONFIG_SYS_NAND_BASE_LIST	{ 0x02000000, }
 /* socket has two chipselects, nCE0 gated by address BIT(14) */
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_SYS_NAND_MAX_CHIPS	2
+#define CONFIG_SYS_NAND_MAX_CHIPS	1
 
 /* SD/MMC */
 #define CONFIG_MMC
@@ -93,8 +98,8 @@
 #define PINMUX4_USBDRVBUS_BITSET         0x2000
 
 /* USB Configuration */
-#define CONFIG_USB_DAVINCI
-#define CONFIG_MUSB_HCD
+#undef CONFIG_USB_DAVINCI
+#undef CONFIG_MUSB_HCD
 
 #ifdef CONFIG_USB_DAVINCI
 #define CONFIG_CMD_USB         /* include support for usb      */
@@ -130,14 +135,14 @@
 /* U-Boot command configuration */
 #include <config_cmd_default.h>
 
-#undef CONFIG_CMD_BDI
+#define CONFIG_CMD_BDI
 #undef CONFIG_CMD_FLASH
 #undef CONFIG_CMD_FPGA
 #undef CONFIG_CMD_SETGETDCR
 
 #define CONFIG_CMD_ASKENV
 #define CONFIG_CMD_DHCP
-#define CONFIG_CMD_I2C
+#undef CONFIG_CMD_I2C
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_SAVES
 
@@ -153,10 +158,10 @@
 #endif
 
 #ifdef CONFIG_NAND_DAVINCI
+#define CONFIG_CMD_NAND
 #define CONFIG_CMD_MTDPARTS
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_MTD_DEVICE
-#define CONFIG_CMD_NAND
 #define CONFIG_CMD_UBI
 #define CONFIG_RBTREE
 #endif
@@ -165,42 +170,40 @@
 #define CONFIG_MX_CYCLIC
 
 /* U-Boot general configuration */
+#undef CONFIG_USE_IRQ				/* No IRQ/FIQ in U-Boot */
 #define CONFIG_BOOTFILE		"uImage"	/* Boot file name */
-#define CONFIG_SYS_PROMPT	"DM36x EVM # "	/* Monitor Command Prompt */
+#define CONFIG_SYS_PROMPT	"DM36x NAND-Boot# "	/* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE	1024		/* Console I/O Buffer Size  */
 #define CONFIG_SYS_PBSIZE			/* Print buffer size */ \
 		(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_SYS_MAXARGS	16		/* max number of command args */
 #define CONFIG_SYS_HUSH_PARSER
+#define CONFIG_AUTO_COMPLETE
+#define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
 #define CONFIG_SYS_LONGHELP
 
 #ifdef CONFIG_NAND_DAVINCI
-#define CONFIG_ENV_SIZE		(256 << 10)	/* 256 KiB */
+#define CONFIG_ENV_SIZE		(128 << 10)	/* 128KiB */
 #define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_ENV_OFFSET	0x3C0000
+#define CONFIG_ENV_OFFSET	0x4C0000
 #undef CONFIG_ENV_IS_IN_FLASH
 #endif
 
 #if defined(CONFIG_MMC) && !defined(CONFIG_ENV_IS_IN_NAND)
 #define CONFIG_CMD_ENV
+#define CONFIG_SYS_MMC_ENV_DEV	0
 #define CONFIG_ENV_SIZE		(16 << 10)	/* 16 KiB */
 #define CONFIG_ENV_OFFSET	(51 << 9)	/* Sector 51 */
 #define CONFIG_ENV_IS_IN_MMC
 #undef CONFIG_ENV_IS_IN_FLASH
 #endif
 
-#define CONFIG_BOOTDELAY	3
-#define CONFIG_BOOTCOMMAND \
-		"dhcp;bootm"
-#define CONFIG_BOOTARGS \
-		"console=ttyS0,115200n8 " \
-		"root=/dev/mmcblk0p1 rootwait rootfstype=ext3 ro"
-
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_VERSION_VARIABLE
 #define CONFIG_TIMESTAMP
 
 /* U-Boot memory configuration */
+#define CONFIG_STACKSIZE		    (256 << 10)	/* 256 KiB */
 #define CONFIG_SYS_MALLOC_LEN		(1 << 20)	/* 1 MiB */
 #define CONFIG_SYS_MEMTEST_START	0x87000000	/* physical address */
 #define CONFIG_SYS_MEMTEST_END		0x88000000	/* test 16MB RAM */
@@ -209,8 +212,7 @@
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_SYS_BARGSIZE	1024			/* bootarg Size */
-#define CONFIG_SYS_LOAD_ADDR	0x80700000		/* kernel address */
-
+#define CONFIG_SYS_LOAD_ADDR	0x82000000		/* kernel address */
 
 /* NAND configuration issocketed with two chipselects just like the DM355 EVM.
  * It normally comes with a 2GByte SLC part with 2KB pages
@@ -219,26 +221,134 @@
  * pretty much demands the 4-bit ECC support.)  You can of course swap in
  * other parts, including small page ones.
  */
-#define MTDIDS_DEFAULT		"nand0=davinci_nand.0"
+#define CONFIG_CMD_NAND_YAFFS
 
-#ifdef CONFIG_SYS_NAND_LARGEPAGE
-/*  Use same layout for 128K/256K blocks; allow some bad blocks */
-#define PART_BOOT		"2m(bootloader)ro,"
-#else
-/* Assume 16K erase blocks; allow a few bad ones. */
-#define PART_BOOT		"512k(bootloader)ro,"
-#endif
-
-#define PART_KERNEL		"4m(kernel),"	/* kernel + initramfs */
-#define PART_REST		"-(filesystem)"
-
-#define MTDPARTS_DEFAULT	\
-	"mtdparts=davinci_nand.0:" PART_BOOT PART_KERNEL PART_REST
+#define CONFIG_CMD_JFFS2		
+#define CONFIG_JFFS2_CMDLINE		
+#define CONFIG_JFFS2_NAND		
+#define CONFIG_JFFS2_DEV		"nand0" /* NAND dev jffs2 lives on */
+#define CONFIG_JFFS2_PART_OFFSET 	0	/* start of jffs2 partition */
+#define CONFIG_JFFS2_PART_SIZE		(256 * 1024 * 1024) /* partition */
 
 #define CONFIG_MAX_RAM_BANK_SIZE	(256 << 20)	/* 256 MB */
 
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1
 #define CONFIG_SYS_INIT_SP_ADDR		\
 	(CONFIG_SYS_SDRAM_BASE + 0x1000 - GENERATED_GBL_DATA_SIZE)
+	
+
+#define CONFIG_BOOTDELAY	1
+
+#define CONFIG_NETMASK		255.255.255.0
+#define CONFIG_IPADDR		192.168.3.168
+#define CONFIG_GATEWAYIP    192.168.3.1
+#define CONFIG_SERVERIP		192.168.3.29
+#define CONFIG_ETHADDR      00:01:02:03:04:05
+
+
+#define CONFIG_BOOTCOMMAND  \
+"nboot 0x80700000 0 0x500000;bootm 0x80700000"
+
+#define CONFIG_BOOTCOMMAND_KERNEL1  \
+"setenv bootcmd 'nboot 0x80700000 0 0x500000;bootm 0x80700000';"\
+"saveenv"
+
+#define CONFIG_BOOTCOMMAND_KERNEL2  \
+"setenv bootcmd 'nboot 0x80700000 0 0x2900000;bootm 0x80700000';"\
+"saveenv"
+
+#define CONFIG_BOOTARGS   \
+"mem=48M console=ttyS0,115200n8 init=/init "   \
+"root=/dev/mtdblock3 rootfstype=cramfs rw "  \
+"ip=192.168.3.168:192.168.3.29:192.168.3.1:255.255.255.0::eth0:off eth=00:01:02:03:04:05 " \
+"cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1 "
+
+#define CONFIG_BOOTARGS_ROOTFS1     \
+"setenv bootargs mem=48M console=ttyS0,115200n8 init=/init "   \
+"root=/dev/mtdblock3 rootfstype=cramfs rw "  \
+"ip=$ipaddr:$serverip:$gatewayip:$netmask::eth0:off eth=$ethaddr " \
+"cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1;"\
+"saveenv"
+
+#define CONFIG_BOOTARGS_ROOTFS2     \
+"setenv bootargs mem=48M console=ttyS0,115200n8 init=/init "   \
+"root=/dev/mtdblock5 rootfstype=cramfs rw "  \
+"ip=$ipaddr:$serverip:$gatewayip:$netmask::eth0:off eth=$ethaddr " \
+"cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1;"\
+"saveenv"
+
+#define CONFIG_BOOTARGS_NFS    \
+"setenv bootargs 'mem=48M console=ttyS0,115200n8 init=/init " \
+"root=/dev/nfs rw nfsroot=192.168.3.29:/home/jiangjx/UbuntuShare/filesys nolock " \
+"ip=192.168.3.168:192.168.3.29:192.168.3.1:255.255.255.0::eth0:off eth=00:01:02:03:04:05 " \
+"cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1';"\
+"saveenv"
+
+#define CONFIG_EXTRA_ENV_SETTINGS     \	
+"loadaddr=82000000\0"\
+"bootaddr=80700000\0"\
+"kernel1addr=500000\0"\ 
+"rootfs1addr=900000\0"\ 
+"kernel2addr=2900000\0"\
+"rootfs2addr=2D00000\0"\ 
+"led_on=mw 01C4000C E15AFFFF;mw 01C67010 0;mw 01C6701C FFFFFFFF\0"\
+"led_off=mw 01C4000C E15AFFFF;mw 01C67010 0;mw 01C67018 FFFFFFFF\0"\
+"erase_env=nand erase 4c0000 20000\0"\
+"set_run_system1=run bootcmd_kernel1;run bootargs_rootfs1\0"\
+"set_run_system2=run bootcmd_kernel2;run bootargs_rootfs2\0"\
+"sd_update_kernel1=if mmc rescan && fatload mmc 0 $loadaddr nand/uImage;then "\
+                   "nand erase.part kernel1;"\
+                   "nand write $loadaddr $kernel1addr $filesize;fi\0"\
+"sd_update_kernel2=if mmc rescan && fatload mmc 0 $loadaddr nand/uImage;then "\
+                   "nand erase.part kernel2;"\
+                   "nand write $loadaddr $kernel2addr $filesize;fi\0"\
+"sd_update_rootfs1=if mmc rescan && fatload mmc 0 $loadaddr nand/rootfs.cramfs;then "\
+                   "nand erase.part rootfs1;"\
+                   "nand write $loadaddr $rootfs1addr $filesize;\0"\
+"sd_update_rootfs2=if mmc rescan && fatload mmc 0 $loadaddr nand/rootfs.cramfs;then "\
+                   "nand erase.part rootfs2;"\
+                   "nand write $loadaddr $rootfs2addr $filesize;\0"\
+"sd_update_system1=run sd_update_kernel1;run sd_update_rootfs1;run set_run_system1;"\
+                   "echo SD Update System1 Finished!!!\0"\
+"sd_update_system2=run sd_update_kernel2;run sd_update_rootfs2;run set_run_system2;"\
+	               "echo SD Update System2 Finished!!!\0"\
+"update_kernel1=tftp $loadaddr uImage;"\
+		           "nand erase.part kernel1;"\
+		           "nand write $loadaddr $kernel1addr $filesize;\0"\
+"update_kernel2=tftp $loadaddr uImage;"\
+		           "nand erase.part kernel2;"\
+		           "nand write $loadaddr $kernel2addr $filesize;\0"\
+"update_rootfs1=tftp $loadaddr rootfs.cramfs;"\
+		           "nand erase.part rootfs1;"\
+                   "nand write $loadaddr $rootfs1addr $filesize;\0"\
+"update_rootfs2=tftp $loadaddr rootfs.cramfs;"\
+		           "nand erase.part rootfs2;"\
+                   "nand write $loadaddr $rootfs2addr $filesize;\0"\
+"update_system1=run update_kernel1;run update_rootfs1;run set_run_system1;"\
+                   "echo TFTP Update System1 Finished!!!\0"\
+"update_system2=run update_kernel2;run update_rootfs2;run set_run_system2;"\
+                   "echo TFTP Update System2 Finished!!!"
+
+
+#define MTDIDS_DEFAULT		"nand0=davinci_nand.0"
+
+//#ifdef CONFIG_SYS_NAND_LARGEPAGE
+/*  Use same layout for 128K/256K blocks; allow some bad blocks */
+#define PART_UBL		"3m(UBL)ro,"
+//#else
+/* Assume 16K erase blocks; allow a few bad ones. */
+//#define PART_BOOT		"512k(bootloader)ro,"
+//#endif
+
+#define PART_UBOOT   	"2m(U-BOOT),"	
+#define PART_KERNEL1	"4m(kernel1),"	
+#define PART_ROOTFS1	"32m(rootfs1),"	
+#define PART_KERNEL2	"4m(kernel2),"	
+#define PART_ROOTFS2	"32m(rootfs2),"	
+#define PART_REST		"-(ParaApp)"
+
+#define MTDPARTS_DEFAULT	\
+"mtdparts=davinci_nand.0:" PART_UBL PART_UBOOT PART_KERNEL1 PART_ROOTFS1 PART_KERNEL2 PART_ROOTFS2 PART_REST
+
 
 #endif /* __CONFIG_H */
