@@ -51,6 +51,13 @@ DECLARE_GLOBAL_DATA_PTR;
 #define DDR_PLLDIV	PLLC_PLLDIV1
 #endif
 
+#ifdef CONFIG_SOC_DM365
+#define ARM_PLLDIV	PLLC_PLLDIV2 //PLLC1_SYSCLK2 or PLLC2_SYSCLK2
+#define DDR_PLLDIV	PLLC_PLLDIV7 //PLLC1_SYSCLK7 or PLLC2_SYSCLK3. Assume PLLC1_SYSCLK7
+#define SYSTEM_MOD	0x01C40000
+#define PERL_CTRL	0x48
+#endif
+
 #ifdef CONFIG_SOC_DM644X
 #define ARM_PLLDIV	PLLC_PLLDIV2
 #define DSP_PLLDIV	PLLC_PLLDIV1
@@ -224,6 +231,44 @@ int set_cpu_clk_info(void)
 }
 
 #endif /* !CONFIG_SOC_DA8XX */
+
+int print_cpuinfo(void)
+{
+	/* REVISIT fetch and display CPU ID and revision information
+	 * too ... that will matter as more revisions appear.
+	 */
+	unsigned int pllbase;
+	unsigned int sysdiv;	
+
+	pllbase = DAVINCI_PLL_CNTRL0_BASE;
+	sysdiv = ARM_PLLDIV;
+#ifdef CONFIG_SOC_DM365
+	pllbase = (REG(SYSTEM_MOD + PERL_CTRL) & BIT(29)) ? 
+			DAVINCI_PLL_CNTRL1_BASE : DAVINCI_PLL_CNTRL0_BASE;
+#endif
+	printf("Cores: ARM %d MHz",
+			pll_sysclk_mhz(pllbase, sysdiv));
+
+#ifdef DSP_PLLDIV
+	printf(", DSP %d MHz",
+			pll_sysclk_mhz(DAVINCI_PLL_CNTRL0_BASE, DSP_PLLDIV));
+#endif
+
+	pllbase = DAVINCI_PLL_CNTRL1_BASE;
+	sysdiv = DDR_PLLDIV;
+#ifdef CONFIG_SOC_DM365
+	pllbase = (REG(SYSTEM_MOD + PERL_CTRL) & BIT(27)) ?
+			 DAVINCI_PLL_CNTRL1_BASE : DAVINCI_PLL_CNTRL0_BASE;
+	
+	if(pllbase == DAVINCI_PLL_CNTRL1_BASE)
+		sysdiv = PLLC_PLLDIV3; 
+#endif
+	printf("\nDDR:   %d MHz\n",
+			/* DDR PHY uses an x2 input clock */
+			pll_sysclk_mhz(pllbase, sysdiv)
+				/ 2);
+	return 0;
+}
 
 /*
  * Initializes on-chip ethernet controllers.
