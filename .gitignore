@@ -22,7 +22,7 @@
 #
 # Top-level generic files
 #
-
+/tmp
 /MLO
 /System.map
 /u-boot
