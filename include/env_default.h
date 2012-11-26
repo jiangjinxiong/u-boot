@@ -42,26 +42,20 @@ const uchar default_environment[] = {
 #endif
 
 #ifdef	CONFIG_BOOTARGS
-	"bootargs="	CONFIG_BOOTARGS			               "\0"
+	"bootargs="	CONFIG_BOOTARGS			"\0"
+#endif
+#ifdef	CONFIG_BOOTARGS_NAND
+	"bootargs_nand="	CONFIG_BOOTARGS_NAND		"\0"
+#endif
+#ifdef	CONFIG_BOOTARGS_MMC
+	"bootargs_mmc="	CONFIG_BOOTARGS_MMC		"\0"
 #endif
 #ifdef	CONFIG_BOOTARGS_NFS
-	"bootargs_nfs="	CONFIG_BOOTARGS_NFS		           "\0"
-#endif
-#ifdef	CONFIG_BOOTARGS_ROOTFS1
-	"bootargs_rootfs1="	CONFIG_BOOTARGS_ROOTFS1		   "\0"
-#endif
-#ifdef	CONFIG_BOOTARGS_ROOTFS2
-	"bootargs_rootfs2="	CONFIG_BOOTARGS_ROOTFS2		   "\0"
+	"bootargs_nfs="	CONFIG_BOOTARGS_NFS		"\0"
 #endif
 
 #ifdef	CONFIG_BOOTCOMMAND
 	"bootcmd="	CONFIG_BOOTCOMMAND		               "\0"
-#endif
-#ifdef	CONFIG_BOOTCOMMAND_KERNEL1
-	"bootcmd_kernel1="	CONFIG_BOOTCOMMAND_KERNEL1	   "\0"
-#endif
-#ifdef	CONFIG_BOOTCOMMAND_KERNEL2
-	"bootcmd_kernel2="	CONFIG_BOOTCOMMAND_KERNEL2	   "\0"
 #endif
 
 /*

@@ -67,6 +67,12 @@
 #define CONFIG_BOOTP_SEND_HOSTNAME
 #define CONFIG_NET_RETRY_COUNT	10
 
+#define CONFIG_NETMASK		255.255.255.0
+#define CONFIG_IPADDR		192.168.3.168
+#define CONFIG_GATEWAYIP        192.168.3.1
+#define CONFIG_SERVERIP		192.168.3.29
+#define CONFIG_ETHADDR            00:01:02:03:04:05
+
 /* I2C */
 #undef CONFIG_HARD_I2C
 #undef CONFIG_DRIVER_DAVINCI_I2C
@@ -172,7 +178,7 @@
 /* U-Boot general configuration */
 #undef CONFIG_USE_IRQ				/* No IRQ/FIQ in U-Boot */
 #define CONFIG_BOOTFILE		"uImage"	/* Boot file name */
-#define CONFIG_SYS_PROMPT	"DM36x NAND-Boot# "	/* Monitor Command Prompt */
+#define CONFIG_SYS_PROMPT	"DM36x SD-Boot# "	/* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE	1024		/* Console I/O Buffer Size  */
 #define CONFIG_SYS_PBSIZE			/* Print buffer size */ \
 		(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
@@ -183,9 +189,9 @@
 #define CONFIG_SYS_LONGHELP
 
 #ifdef CONFIG_NAND_DAVINCI
-#define CONFIG_ENV_SIZE		(128 << 10)	/* 128KiB */
-#define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_ENV_OFFSET	0x4C0000
+//#define CONFIG_ENV_SIZE		(128 << 10)	/* 128 KiB */
+//#define CONFIG_ENV_IS_IN_NAND
+//#define CONFIG_ENV_OFFSET	0x4e0000
 #undef CONFIG_ENV_IS_IN_FLASH
 #endif
 
@@ -197,7 +203,7 @@
 #define CONFIG_ENV_IS_IN_MMC
 #undef CONFIG_ENV_IS_IN_FLASH
 #endif
-
+      
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_VERSION_VARIABLE
 #define CONFIG_TIMESTAMP
@@ -221,9 +227,7 @@
  * pretty much demands the 4-bit ECC support.)  You can of course swap in
  * other parts, including small page ones.
  */
-#define CONFIG_CMD_NAND_YAFFS
-
-#define CONFIG_CMD_JFFS2		
+#define CONFIG_CMD_NAND_YAFFS		
 #define CONFIG_JFFS2_CMDLINE		
 #define CONFIG_JFFS2_NAND		
 #define CONFIG_JFFS2_DEV		"nand0" /* NAND dev jffs2 lives on */
@@ -235,99 +239,95 @@
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1
 #define CONFIG_SYS_INIT_SP_ADDR		\
 	(CONFIG_SYS_SDRAM_BASE + 0x1000 - GENERATED_GBL_DATA_SIZE)
-	
+
 
 #define CONFIG_BOOTDELAY	1
 
-#define CONFIG_NETMASK		255.255.255.0
-#define CONFIG_IPADDR		192.168.3.168
-#define CONFIG_GATEWAYIP    192.168.3.1
-#define CONFIG_SERVERIP		192.168.3.29
-#define CONFIG_ETHADDR      00:01:02:03:04:05
-
-
 #define CONFIG_BOOTCOMMAND  \
-"nboot 0x80700000 0 0x500000;bootm 0x80700000"
-
-#define CONFIG_BOOTCOMMAND_KERNEL1  \
-"setenv bootcmd 'nboot 0x80700000 0 0x500000;bootm 0x80700000';"\
-"saveenv"
-
-#define CONFIG_BOOTCOMMAND_KERNEL2  \
-"setenv bootcmd 'nboot 0x80700000 0 0x2900000;bootm 0x80700000';"\
-"saveenv"
-
+"run led_off;run update_all;run led_on;"\
+"echo 【烧写完成啦!】请先关闭电源、然后设置 启动模式、再上电即可正常工作!"
+			
 #define CONFIG_BOOTARGS   \
-"mem=48M console=ttyS0,115200n8 init=/init "   \
-"root=/dev/mtdblock3 rootfstype=cramfs rw "  \
-"ip=192.168.3.168:192.168.3.29:192.168.3.1:255.255.255.0::eth0:off eth=00:01:02:03:04:05 " \
-"cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1 "
+"mem=48M console=ttyS0,115200n8 "   \
+"root=/dev/mmcblk0p1 rootfstype=cramfs rw init=/init "  \
+"ip=$ipaddr:$serverip:$gatewayip:$netmask:$hostname:eth0:off eth=$ethaddr " \
+"cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1"
 
-#define CONFIG_BOOTARGS_ROOTFS1     \
-"setenv bootargs mem=48M console=ttyS0,115200n8 init=/init "   \
-"root=/dev/mtdblock3 rootfstype=cramfs rw "  \
+#define CONFIG_BOOTARGS_NAND     \
+"setenv bootargs mem=48M console=ttyS0,115200n8 " \
+"root=/dev/mtdblock3 rootfstype=cramfs rw init=/init "  \
 "ip=$ipaddr:$serverip:$gatewayip:$netmask::eth0:off eth=$ethaddr " \
 "cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1;"\
 "saveenv"
 
-#define CONFIG_BOOTARGS_ROOTFS2     \
-"setenv bootargs mem=48M console=ttyS0,115200n8 init=/init "   \
-"root=/dev/mtdblock5 rootfstype=cramfs rw "  \
+#define CONFIG_BOOTARGS_MMC     \
+"setenv bootargs mem=48M console=ttyS0,115200n8 " \
+"root=/dev/mmcblk0p1 rootfstype=cramfs rw init=/init "  \
 "ip=$ipaddr:$serverip:$gatewayip:$netmask::eth0:off eth=$ethaddr " \
 "cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1;"\
 "saveenv"
 
-#define CONFIG_BOOTARGS_NFS    \
-"setenv bootargs 'mem=48M console=ttyS0,115200n8 init=/init " \
-"root=/dev/nfs rw nfsroot=192.168.3.29:/home/jiangjx/UbuntuShare/filesys nolock " \
-"ip=192.168.3.168:192.168.3.29:192.168.3.1:255.255.255.0::eth0:off eth=00:01:02:03:04:05 " \
-"cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1';"\
+#define CONFIG_BOOTARGS_NFS     \
+"setenv bootargs mem=48M console=ttyS0,115200n8 " \
+"root=/dev/nfs rw nfsroot=$serverip:/home/jiangjx/UbuntuShare/filesys nolock " \
+"ip=$ipaddr:$serverip:$gatewayip:$netmask::eth0:off eth=$ethaddr " \
+"cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1;"\
 "saveenv"
-
+  
 #define CONFIG_EXTRA_ENV_SETTINGS     \	
 "loadaddr=82000000\0"\
-"bootaddr=80700000\0"\
-"kernel1addr=500000\0"\ 
-"rootfs1addr=900000\0"\ 
+"kernel1addr=500000\0"\
+"kernel1erasesize=400000\0"\
+"rootfs1addr=900000\0"\
+"rootfs1erasesize=2000000\0"\
 "kernel2addr=2900000\0"\
-"rootfs2addr=2D00000\0"\ 
+"kernel2erasesize=400000\0"\
+"rootfs2addr=2D00000\0"\
+"rootfs2erasesize=2000000\0"\
 "led_on=mw 01C4000C E15AFFFF;mw 01C67010 0;mw 01C6701C FFFFFFFF\0"\
 "led_off=mw 01C4000C E15AFFFF;mw 01C67010 0;mw 01C67018 FFFFFFFF\0"\
-"erase_env=nand erase 4c0000 20000\0"\
-"set_run_system1=run bootcmd_kernel1;run bootargs_rootfs1\0"\
-"set_run_system2=run bootcmd_kernel2;run bootargs_rootfs2\0"\
-"sd_update_kernel1=if mmc rescan && fatload mmc 0 $loadaddr nand/uImage;then "\
-                   "nand erase.part kernel1;"\
-                   "nand write $loadaddr $kernel1addr $filesize;fi\0"\
-"sd_update_kernel2=if mmc rescan && fatload mmc 0 $loadaddr nand/uImage;then "\
-                   "nand erase.part kernel2;"\
-                   "nand write $loadaddr $kernel2addr $filesize;fi\0"\
-"sd_update_rootfs1=if mmc rescan && fatload mmc 0 $loadaddr nand/rootfs.cramfs;then "\
-                   "nand erase.part rootfs1;"\
-                   "nand write $loadaddr $rootfs1addr $filesize;\0"\
-"sd_update_rootfs2=if mmc rescan && fatload mmc 0 $loadaddr nand/rootfs.cramfs;then "\
-                   "nand erase.part rootfs2;"\
-                   "nand write $loadaddr $rootfs2addr $filesize;\0"\
-"sd_update_system1=run sd_update_kernel1;run sd_update_rootfs1;run set_run_system1;"\
-                   "echo SD Update System1 Finished!!!\0"\
-"sd_update_system2=run sd_update_kernel2;run sd_update_rootfs2;run set_run_system2;"\
-	               "echo SD Update System2 Finished!!!\0"\
-"update_kernel1=tftp $loadaddr uImage;"\
-		           "nand erase.part kernel1;"\
-		           "nand write $loadaddr $kernel1addr $filesize;\0"\
-"update_kernel2=tftp $loadaddr uImage;"\
-		           "nand erase.part kernel2;"\
-		           "nand write $loadaddr $kernel2addr $filesize;\0"\
-"update_rootfs1=tftp $loadaddr rootfs.cramfs;"\
-		           "nand erase.part rootfs1;"\
-                   "nand write $loadaddr $rootfs1addr $filesize;\0"\
-"update_rootfs2=tftp $loadaddr rootfs.cramfs;"\
-		           "nand erase.part rootfs2;"\
-                   "nand write $loadaddr $rootfs2addr $filesize;\0"\
-"update_system1=run update_kernel1;run update_rootfs1;run set_run_system1;"\
-                   "echo TFTP Update System1 Finished!!!\0"\
-"update_system2=run update_kernel2;run update_rootfs2;run set_run_system2;"\
-                   "echo TFTP Update System2 Finished!!!"
+"update_ubl=mmc rescan;nand erase 20000 A0000;"\
+	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk01;nand write $loadaddr 20000 20000;"\
+	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk02;nand write $loadaddr 40000 20000;"\
+	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk03;nand write $loadaddr 60000 20000;"\
+	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk04;nand write $loadaddr 80000 20000;"\
+	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk05;nand write $loadaddr A0000 20000\0"\  
+"update_uboot=mmc rescan;nand erase 220000 280000;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk17;nand write $loadaddr 220000 80000;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk21;nand write $loadaddr 2A0000 80000;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk25;nand write $loadaddr 320000 80000;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk29;nand write $loadaddr 3A0000 80000;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk33;nand write $loadaddr 420000 80000\0"\
+"update_kernel=mmc rescan;fatload mmc 0 $loadaddr sd/uImage;"\
+    "nand erase $kernel1addr $kernel1erasesize;"\
+	"nand write $loadaddr $kernel1addr $filesize;"\
+	"nand erase $kernel2addr $kernel2erasesize;"\
+	"nand write $loadaddr $kernel2addr $filesize\0"\
+"update_rootfs=mmc rescan;fatload mmc 0 $loadaddr sd/rootfs.cramfs;"\
+    "nand erase $rootfs1addr $rootfs1erasesize;"\
+	"nand write $loadaddr $rootfs1addr $filesize;" \
+	"nand erase $rootfs2addr $rootfs2erasesize;"\
+	"nand write $loadaddr $rootfs2addr $filesize\0"\                
+"update_all=mmc rescan;nand scrub.chip;nand erase.chip;"\
+	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk01;nand write $loadaddr 20000 20000;"\
+	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk02;nand write $loadaddr 40000 20000;"\
+ 	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk03;nand write $loadaddr 60000 20000;"\
+	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk04;nand write $loadaddr 80000 20000;"\
+	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk05;nand write $loadaddr A0000 20000;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk17;nand write $loadaddr 220000 80000;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk21;nand write $loadaddr 2A0000 80000;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk25;nand write $loadaddr 320000 80000;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk29;nand write $loadaddr 3A0000 80000;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk33;nand write $loadaddr 420000 80000;"\
+	"fatload mmc 0 $loadaddr sd/uImage;nand write $loadaddr $kernel1addr $filesize;"\
+	                                  "nand write $loadaddr $kernel2addr $filesize;"\
+	"fatload mmc 0 $loadaddr sd/rootfs.cramfs;nand write $loadaddr $rootfs1addr $filesize\0"
+	                                  //"nand write $loadaddr $rootfs2addr $filesize\0"
+                    
+//mw 01C4000C e15affff  PINMUX3
+//mw 01C67010 0       设置GPIO输出
+//mw 01C67018 ffffffff  灯灭
+//mw 01C6701C ffffffff   灯亮
 
 
 #define MTDIDS_DEFAULT		"nand0=davinci_nand.0"

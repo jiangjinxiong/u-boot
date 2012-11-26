@@ -568,7 +568,7 @@ static int do_nand(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		opts.jffs2  = clean;
 		opts.quiet  = quiet;
 		opts.spread = spread;
-
+        /*
 		if (scrub) {
 			if (!scrub_yes)
 				puts(scrub_warn);
@@ -588,6 +588,8 @@ static int do_nand(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 				return -1;
 			}
 		}
+		*/
+		opts.scrub = 1;
 		ret = nand_erase_opts(nand, &opts);
 		printf("%s\n", ret ? "ERROR" : "OK");
 
