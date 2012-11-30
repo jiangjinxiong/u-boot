@@ -1,10 +1,6 @@
 /*
- * Copyright (c) 2011 The Chromium OS Authors.
- * (C) Copyright 2008,2009
- * Graeme Russ, <graeme.russ@gmail.com>
- *
- * (C) Copyright 2002
- * Daniel Engström, Omicron Ceti AB, <daniel@omicron.se>
+ * (C) Copyright 2012
+ * Ilya Yanok, <ilya.yanok@gmail.com>
  *
  * See file CREDITS for list of people who contributed to this
  * project.
@@ -16,15 +12,17 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * Foundation, Inc.
  */
 
-void pci_init_board(void)
-{
-}
+#ifndef __ASM_ARCH_OMAP3_MUSB_H
+#define __ASM_ARCH_OMAP3_MUSB_H
+extern void am35x_musb_reset(void);
+extern void am35x_musb_phy_power(u8 on);
+extern void am35x_musb_clear_irq(void);
+#endif

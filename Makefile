@@ -231,8 +231,8 @@ endif
 
 OBJS  = $(CPUDIR)/start.o
 ifeq ($(CPU),x86)
-OBJS += $(CPUDIR)/start16.o
-OBJS += $(CPUDIR)/resetvec.o
+RESET_OBJS-$(CONFIG_X86_NO_RESET_VECTOR) += $(CPUDIR)/start16.o
+RESET_OBJS-$(CONFIG_X86_NO_RESET_VECTOR) += $(CPUDIR)/resetvec.o
 endif
 ifeq ($(CPU),ppc4xx)
 OBJS += $(CPUDIR)/resetvec.o
@@ -241,7 +241,7 @@ ifeq ($(CPU),mpc85xx)
 OBJS += $(CPUDIR)/resetvec.o
 endif
 
-OBJS := $(addprefix $(obj),$(OBJS))
+OBJS := $(addprefix $(obj),$(OBJS) $(RESET_OBJS-))
 
 HAVE_VENDOR_COMMON_LIB = $(if $(wildcard board/$(VENDOR)/common/Makefile),y,n)
 
@@ -322,6 +322,7 @@ LIBS-y += drivers/usb/eth/libusb_eth.o
 LIBS-y += drivers/usb/gadget/libusb_gadget.o
 LIBS-y += drivers/usb/host/libusb_host.o
 LIBS-y += drivers/usb/musb/libusb_musb.o
+LIBS-y += drivers/usb/musb-new/libusb_musb-new.o
 LIBS-y += drivers/usb/phy/libusb_phy.o
 LIBS-y += drivers/usb/ulpi/libusb_ulpi.o
 LIBS-y += drivers/video/libvideo.o
@@ -407,6 +408,7 @@ ALL-y += $(obj)u-boot.srec $(obj)u-boot.bin $(obj)System.map
 ALL-$(CONFIG_NAND_U_BOOT) += $(obj)u-boot-nand.bin
 ALL-$(CONFIG_ONENAND_U_BOOT) += $(obj)u-boot-onenand.bin
 ALL-$(CONFIG_SPL) += $(obj)spl/u-boot-spl.bin
+ALL-$(CONFIG_SPL) += $(obj)$(subst ",,$(CONFIG_SPL_TARGET))
 ALL-$(CONFIG_OF_SEPARATE) += $(obj)u-boot.dtb $(obj)u-boot-dtb.bin
 
 # enable combined SPL/u-boot/dtb rules for tegra
@@ -474,13 +476,14 @@ $(obj)u-boot.sha1:	$(obj)u-boot.bin
 $(obj)u-boot.dis:	$(obj)u-boot
 		$(OBJDUMP) -d $< > $@
 
-$(obj)u-boot.ubl:       $(obj)spl/u-boot-spl.bin $(obj)u-boot.bin
+$(obj)u-boot-with-spl.bin: $(obj)spl/u-boot-spl.bin $(obj)u-boot.bin
 		$(OBJCOPY) ${OBJCFLAGS} --pad-to=$(PAD_TO) -O binary $(obj)spl/u-boot-spl $(obj)spl/u-boot-spl-pad.bin
-		cat $(obj)spl/u-boot-spl-pad.bin $(obj)u-boot.bin > $(obj)u-boot-ubl.bin
-		$(obj)tools/mkimage -n $(UBL_CONFIG) -T ublimage \
-		-e $(CONFIG_SYS_TEXT_BASE) -d $(obj)u-boot-ubl.bin $(obj)u-boot.ubl
-		rm $(obj)u-boot-ubl.bin
+		cat $(obj)spl/u-boot-spl-pad.bin $(obj)u-boot.bin > $@
 		rm $(obj)spl/u-boot-spl-pad.bin
+
+$(obj)u-boot.ubl:       $(obj)u-boot-with-spl.bin
+		$(obj)tools/mkimage -n $(UBL_CONFIG) -T ublimage \
+		-e $(CONFIG_SYS_TEXT_BASE) -d $< $(obj)u-boot.ubl
 
 $(obj)u-boot.ais:       $(obj)spl/u-boot-spl.bin $(obj)u-boot.img
 		$(obj)tools/mkimage -s -n $(if $(CONFIG_AIS_CONFIG_FILE),$(CONFIG_AIS_CONFIG_FILE),"/dev/null") \
@@ -641,6 +644,16 @@ checkthumb:
 		echo '*** Your board is configured for THUMB mode.'; \
 		false; \
 	fi
+
+# GCC 3.x is reported to have problems generating the type of relocation
+# that U-Boot wants.
+# See http://lists.denx.de/pipermail/u-boot/2012-September/135156.html
+checkgcc4:
+	@if test $(call cc-version) -lt 0400; then \
+		echo -n '*** Your GCC is too old, please upgrade to GCC 4.x or newer'; \
+		false; \
+	fi
+
 #
 # Auto-generate the autoconf.mk file (which is included by all makefiles)
 #
