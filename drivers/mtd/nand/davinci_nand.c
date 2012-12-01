@@ -289,14 +289,17 @@ static struct nand_ecclayout nand_davinci_4bit_layout_oobfirst = {
 	.oobfree = {
 		{.offset = 2, .length = 22, },
 */
-	.eccbytes = 40,
+	.eccbytes = 10,
 	.eccpos = {
 		6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
 		22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 
 		38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 
 		54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
 		},
-	.oobfree = {{2, 4}, {16, 6}, {32, 6}, {48, 6}},
+	/*.oobfree = {{2, 4}, {16, 6}, {32, 6}, {48, 6}},*/
+	.oobfree = {{0, 6}, {16, 6}, {32, 6}, {48, 6},
+		        {64, 6}, {80, 6}, {96, 6}, {112, 6}},
+    
 
 #elif defined(CONFIG_SYS_NAND_PAGE_4K)
 	.eccbytes = 80,
