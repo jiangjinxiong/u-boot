@@ -69,9 +69,9 @@
 
 #define CONFIG_NETMASK		255.255.255.0
 #define CONFIG_IPADDR		192.168.3.168
-#define CONFIG_GATEWAYIP        192.168.3.1
+#define CONFIG_GATEWAYIP    192.168.3.1
 #define CONFIG_SERVERIP		192.168.3.29
-#define CONFIG_ETHADDR            00:01:02:03:04:05
+#define CONFIG_ETHADDR      00:01:02:03:04:05
 
 /* I2C */
 #undef CONFIG_HARD_I2C
@@ -245,11 +245,16 @@
 
 #define CONFIG_BOOTCOMMAND  \
 "run led_off;run update_all;run led_on;"\
-"echo 【烧写完成啦!】请先关闭电源、然后设置 启动模式、再上电即可正常工作!"
+"echo 【内核、文件系统烧写完成】;\n"\
+"echo  请按照以下操作从SD卡烧写字体文件到NAND...;\n"\
+"echo  1、首先请断电1秒钟以上;\n"\
+"echo  2、设置拨码开关为NAND启动模式;\n"\
+"echo  3、重新上电，内核启动后从SD卡拷贝字体到NAND;\n"\
+"echo  4、上电后等待20秒以上，即可拔出SD卡\n\n;"
 			
 #define CONFIG_BOOTARGS   \
 "mem=48M console=ttyS0,115200n8 "   \
-"root=/dev/mmcblk0p1 rootfstype=cramfs rw init=/init "  \
+"root=/dev/mtdblock3 rootfstype=cramfs rw init=/init "  \
 "ip=$ipaddr:$serverip:$gatewayip:$netmask:$hostname:eth0:off eth=$ethaddr " \
 "cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1"
 
@@ -319,8 +324,7 @@
 	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk25;nand write $loadaddr 320000 80000;"\
 	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk29;nand write $loadaddr 3A0000 80000;"\
 	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk33;nand write $loadaddr 420000 80000;"\
-	"fatload mmc 0 $loadaddr sd/uImage;nand write $loadaddr $kernel1addr $filesize;"\
-	                                  "nand write $loadaddr $kernel2addr $filesize;"\
+	"fatload mmc 0 $loadaddr sd/uImage;nand write $loadaddr $kernel1addr $filesize;"\                                
 	"fatload mmc 0 $loadaddr sd/rootfs.cramfs;nand write $loadaddr $rootfs1addr $filesize\0"
 	                                  //"nand write $loadaddr $rootfs2addr $filesize\0"
                     
@@ -330,22 +334,22 @@
 //mw 01C6701C ffffffff   灯亮
 
 
-#define MTDIDS_DEFAULT		"nand0=davinci_nand.0"
+#define MTDIDS_DEFAULT	"nand0=davinci_nand.0"
 
 //#ifdef CONFIG_SYS_NAND_LARGEPAGE
 /*  Use same layout for 128K/256K blocks; allow some bad blocks */
-#define PART_UBL		"3m(UBL)ro,"
+#define PART_UBL		"3m(ubl)ro,"
 //#else
 /* Assume 16K erase blocks; allow a few bad ones. */
 //#define PART_BOOT		"512k(bootloader)ro,"
 //#endif
 
-#define PART_UBOOT   	"2m(U-BOOT),"	
+#define PART_UBOOT   	"2m(uboot),"	
 #define PART_KERNEL1	"4m(kernel1),"	
 #define PART_ROOTFS1	"32m(rootfs1),"	
 #define PART_KERNEL2	"4m(kernel2),"	
 #define PART_ROOTFS2	"32m(rootfs2),"	
-#define PART_REST		"-(ParaApp)"
+#define PART_REST		"-(paraapp)"
 
 #define MTDPARTS_DEFAULT	\
 "mtdparts=davinci_nand.0:" PART_UBL PART_UBOOT PART_KERNEL1 PART_ROOTFS1 PART_KERNEL2 PART_ROOTFS2 PART_REST
