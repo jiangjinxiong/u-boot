@@ -390,12 +390,12 @@ __LIBS := $(subst $(obj),,$(LIBS)) $(subst $(obj),,$(LIBBOARD))
 ifneq ($(CONFIG_BOARD_SIZE_LIMIT),)
 BOARD_SIZE_CHECK = \
 	@actual=`wc -c $@ | awk '{print $$1}'`; \
-	limit=$(CONFIG_BOARD_SIZE_LIMIT); \
+	limit=`printf "%d" $(CONFIG_BOARD_SIZE_LIMIT)`; \
 	if test $$actual -gt $$limit; then \
-		echo "$@ exceeds file size limit:"; \
-		echo "  limit:  $$limit bytes"; \
-		echo "  actual: $$actual bytes"; \
-		echo "  excess: $$((actual - limit)) bytes"; \
+		echo "$@ exceeds file size limit:" >&2 ; \
+		echo "  limit:  $$limit bytes" >&2 ; \
+		echo "  actual: $$actual bytes" >&2 ; \
+		echo "  excess: $$((actual - limit)) bytes" >&2; \
 		exit 1; \
 	fi
 else
@@ -450,9 +450,18 @@ $(obj)u-boot.ldr.hex:	$(obj)u-boot.ldr
 $(obj)u-boot.ldr.srec:	$(obj)u-boot.ldr
 		$(OBJCOPY) ${OBJCFLAGS} -O srec $< $@ -I binary
 
+#
+# U-Boot entry point, needed for booting of full-blown U-Boot
+# from the SPL U-Boot version.
+#
+ifndef CONFIG_SYS_UBOOT_START
+CONFIG_SYS_UBOOT_START := 0
+endif
+
 $(obj)u-boot.img:	$(obj)u-boot.bin
 		$(obj)tools/mkimage -A $(ARCH) -T firmware -C none \
-		-O u-boot -a $(CONFIG_SYS_TEXT_BASE) -e 0 \
+		-O u-boot -a $(CONFIG_SYS_TEXT_BASE) \
+		-e $(CONFIG_SYS_UBOOT_START) \
 		-n $(shell sed -n -e 's/.*U_BOOT_VERSION//p' $(VERSION_FILE) | \
 			sed -e 's/"[	 ]*$$/ for $(BOARD) board"/') \
 		-d $< $@
@@ -534,6 +543,9 @@ $(obj)u-boot-$(nodtb)-tegra.bin: $(obj)spl/u-boot-spl.bin $(obj)u-boot.bin $(dtb
 		cat $(obj)spl/u-boot-spl-pad.bin $(obj)u-boot.bin $(dtbfile) > $@
 		rm $(obj)spl/u-boot-spl-pad.bin
 endif
+
+$(obj)u-boot-img.bin: $(obj)spl/u-boot-spl.bin $(obj)u-boot.img
+		cat $(obj)spl/u-boot-spl.bin $(obj)u-boot.img > $@
 
 ifeq ($(CONFIG_SANDBOX),y)
 GEN_UBOOT = \
