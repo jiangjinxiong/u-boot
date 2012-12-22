@@ -24,6 +24,8 @@
  * MA 02111-1307 USA
  */
 
+#include <env_callback.h>
+
 #ifdef DEFAULT_ENV_INSTANCE_EMBEDDED
 env_t environment __PPCENV__ = {
 	ENV_CRC,	/* CRC Sum */
@@ -39,6 +41,13 @@ const uchar default_environment[] = {
 
 #ifdef	MTDPARTS_DEFAULT
 	"mtdparts="	MTDPARTS_DEFAULT		               "\0"
+#endif
+
+#ifdef	CONFIG_ENV_CALLBACK_LIST_DEFAULT
+	ENV_CALLBACK_VAR "=" CONFIG_ENV_CALLBACK_LIST_DEFAULT "\0"
+#endif
+#ifdef	CONFIG_ENV_FLAGS_LIST_DEFAULT
+	ENV_FLAGS_VAR "=" CONFIG_ENV_FLAGS_LIST_DEFAULT "\0"
 #endif
 
 #ifdef	CONFIG_BOOTARGS
