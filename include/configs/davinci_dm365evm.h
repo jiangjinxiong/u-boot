@@ -274,7 +274,7 @@
 
 #define CONFIG_BOOTARGS_NFS     \
 "setenv bootargs mem=48M console=ttyS0,115200n8 " \
-"root=/dev/nfs rw nfsroot=$serverip:/home/jiangjx/UbuntuShare/filesys nolock " \
+"root=/dev/nfs rw nfsroot=$serverip:/home/jiangjx/UbuntuShare/target nolock " \
 "ip=$ipaddr:$serverip:$gatewayip:$netmask::eth0:off eth=$ethaddr " \
 "cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1;"\
 "saveenv"

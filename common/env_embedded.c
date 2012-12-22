@@ -89,7 +89,7 @@
 #  define ENV_CRC	(~0)
 #endif
 
-#define DEFAULT_ENV_INSTANCE_EMBEDDED
+//#define DEFAULT_ENV_INSTANCE_EMBEDDED
 #include <env_default.h>
 
 #ifdef CONFIG_ENV_ADDR_REDUND
