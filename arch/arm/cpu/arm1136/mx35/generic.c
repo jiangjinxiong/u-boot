@@ -478,20 +478,14 @@ int get_clocks(void)
 {
 #ifdef CONFIG_FSL_ESDHC
 #if CONFIG_SYS_FSL_ESDHC_ADDR == MMC_SDHC2_BASE_ADDR
-	gd->sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
+	gd->arch.sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
 #elif CONFIG_SYS_FSL_ESDHC_ADDR == MMC_SDHC3_BASE_ADDR
-	gd->sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
+	gd->arch.sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
 #else
-	gd->sdhc_clk = mxc_get_clock(MXC_ESDHC1_CLK);
+	gd->arch.sdhc_clk = mxc_get_clock(MXC_ESDHC1_CLK);
 #endif
 #endif
 	return 0;
-}
-
-void reset_cpu(ulong addr)
-{
-	struct wdog_regs *wdog = (struct wdog_regs *)WDOG_BASE_ADDR;
-	writew(4, &wdog->wcr);
 }
 
 #define RCSR_MEM_CTL_WEIM	0

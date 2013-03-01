@@ -85,6 +85,9 @@
 #define CONFIG_OMAP_HSMMC		1
 #define CONFIG_DOS_PARTITION		1
 
+/* define to enable boot progress via leds */
+#define CONFIG_SHOW_BOOT_PROGRESS
+
 /* USB */
 #define CONFIG_MUSB_UDC			1
 #define CONFIG_USB_OMAP3		1
@@ -115,7 +118,9 @@
 #ifdef CONFIG_BOOT_NAND
 #define CONFIG_CMD_NAND
 #endif
+#if (CONFIG_MACH_TYPE == MACH_TYPE_IGEP0020)
 #define CONFIG_CMD_NET		/* bootp, tftpboot, rarpboot	*/
+#endif
 #define CONFIG_CMD_DHCP
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_NFS		/* NFS support			*/
@@ -129,8 +134,6 @@
 #define CONFIG_HARD_I2C			1
 #define CONFIG_SYS_I2C_SPEED		100000
 #define CONFIG_SYS_I2C_SLAVE		1
-#define CONFIG_SYS_I2C_BUS		0
-#define CONFIG_SYS_I2C_BUS_SELECT	1
 #define CONFIG_DRIVER_OMAP34XX_I2C	1
 
 /*
