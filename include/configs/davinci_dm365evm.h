@@ -68,10 +68,10 @@
 #define CONFIG_NET_RETRY_COUNT	10
 
 #define CONFIG_NETMASK		255.255.255.0
-#define CONFIG_IPADDR		192.168.3.179
-#define CONFIG_GATEWAYIP    192.168.3.1
-#define CONFIG_SERVERIP		192.168.3.136
-#define CONFIG_ETHADDR      00:01:02:03:04:05
+#define CONFIG_IPADDR		192.168.26.10
+#define CONFIG_GATEWAYIP    192.168.26.1
+#define CONFIG_SERVERIP		192.168.26.211
+#define CONFIG_ETHADDR      74:37:2F:00:00:00
 
 /* I2C */
 #undef CONFIG_HARD_I2C
@@ -244,13 +244,13 @@
 #define CONFIG_BOOTDELAY	1
 
 #define CONFIG_BOOTCOMMAND  \
-"run led_off;run update_all;run led_on;"\
-"echo 【内核、文件系统烧写完成】;\n"\
-"echo  请按照以下操作从SD卡烧写字体文件到NAND...;\n"\
-"echo  1、首先请断电1秒钟以上;\n"\
-"echo  2、设置拨码开关为NAND启动模式;\n"\
-"echo  3、重新上电，内核启动后从SD卡拷贝字体到NAND;\n"\
-"echo  4、上电后等待20秒以上，即可拔出SD卡\n\n;"
+"run led_off;run update_all;run led_on;\n"\
+"echo '-------Ubl & Uboot & Kernel & Rootfs Update OK!!!--------'\n\n;"
+//"echo  请按照以下操作从SD卡烧写字体文件到NAND...;\n"\
+//"echo  1、首先请断电1秒钟以上;\n"\
+//"echo  2、设置拨码开关为NAND启动模式;\n"\
+//"echo  3、重新上电，内核启动后从SD卡拷贝字体到NAND;\n"\
+//"echo  4、上电后等待20秒以上，即可拔出SD卡\n\n;"
 			
 #define CONFIG_BOOTARGS   \
 "mem=48M console=ttyS0,115200n8 "   \
@@ -274,7 +274,7 @@
 
 #define CONFIG_BOOTARGS_NFS     \
 "setenv bootargs mem=48M console=ttyS0,115200n8 " \
-"root=/dev/nfs rw nfsroot=$serverip:/home/jiangjx/UbuntuShare/target nolock " \
+"root=/dev/nfs rw nfsroot=$serverip:/home/jiangjx/UbuntuShare/filesys nolock " \
 "ip=$ipaddr:$serverip:$gatewayip:$netmask::eth0:off eth=$ethaddr " \
 "cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1;"\
 "saveenv"
