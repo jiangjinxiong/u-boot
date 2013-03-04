@@ -278,17 +278,18 @@
 "ip=$ipaddr:$serverip:$gatewayip:$netmask::eth0:off eth=$ethaddr " \
 "cmemk.phys_start=0x83000000 cmemk.phys_end=0x88000000 cmemk.phys_start_1=0x00001000 cmemk.phys_end_1=0x00008000 cmemk.pools_1=1x28672 cmemk.allowOverlap=1;"\
 "saveenv"
-  
+
+
+//"kernel1erasesize=400000\0"
+//"rootfs1erasesize=2000000\0"
+//"kernel2erasesize=400000\0"
+//"rootfs2erasesize=2000000\0"
 #define CONFIG_EXTRA_ENV_SETTINGS     \	
 "loadaddr=82000000\0"\
 "kernel1addr=500000\0"\
-"kernel1erasesize=400000\0"\
 "rootfs1addr=900000\0"\
-"rootfs1erasesize=2000000\0"\
 "kernel2addr=2900000\0"\
-"kernel2erasesize=400000\0"\
 "rootfs2addr=2D00000\0"\
-"rootfs2erasesize=2000000\0"\
 "led_on=mw 01C4000C E15AFFFF;mw 01C67010 0;mw 01C6701C FFFFFFFF\0"\
 "led_off=mw 01C4000C E15AFFFF;mw 01C67010 0;mw 01C67018 FFFFFFFF\0"\
 "update_ubl=mmc rescan;nand erase 20000 A0000;"\
@@ -304,14 +305,14 @@
 	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk29;nand write $loadaddr 3A0000 80000;"\
 	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk33;nand write $loadaddr 420000 80000\0"\
 "update_kernel=mmc rescan;fatload mmc 0 $loadaddr sd/uImage;"\
-    "nand erase $kernel1addr $kernel1erasesize;"\
+    "nand erase.part kernel1;"\
 	"nand write $loadaddr $kernel1addr $filesize;"\
-	"nand erase $kernel2addr $kernel2erasesize;"\
+	"nand erase.part kernel2;"\
 	"nand write $loadaddr $kernel2addr $filesize\0"\
 "update_rootfs=mmc rescan;fatload mmc 0 $loadaddr sd/rootfs.cramfs;"\
-    "nand erase $rootfs1addr $rootfs1erasesize;"\
+    "nand erase.part rootfs1;"\
 	"nand write $loadaddr $rootfs1addr $filesize;" \
-	"nand erase $rootfs2addr $rootfs2erasesize;"\
+	"nand erase.part rootfs2;"\
 	"nand write $loadaddr $rootfs2addr $filesize\0"\                
 "update_all=mmc rescan;nand scrub.chip;nand erase.chip;"\
 	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk01;nand write $loadaddr 20000 20000;"\
@@ -326,8 +327,7 @@
 	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk33;nand write $loadaddr 420000 80000;"\
 	"fatload mmc 0 $loadaddr sd/uImage;nand write $loadaddr $kernel1addr $filesize;"\                                
 	"fatload mmc 0 $loadaddr sd/rootfs.cramfs;nand write $loadaddr $rootfs1addr $filesize\0"
-	                                  //"nand write $loadaddr $rootfs2addr $filesize\0"
-                    
+	                                            
 //mw 01C4000C e15affff  PINMUX3
 //mw 01C67010 0       ÉèÖÃGPIOÊä³ö
 //mw 01C67018 ffffffff  µÆÃð
@@ -353,6 +353,5 @@
 
 #define MTDPARTS_DEFAULT	\
 "mtdparts=davinci_nand.0:" PART_UBL PART_UBOOT PART_KERNEL1 PART_ROOTFS1 PART_KERNEL2 PART_ROOTFS2 PART_REST
-
 
 #endif /* __CONFIG_H */
