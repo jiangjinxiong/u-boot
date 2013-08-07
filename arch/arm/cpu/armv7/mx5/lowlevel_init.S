@@ -3,20 +3,7 @@
  *
  * (C) Copyright 2009 Freescale Semiconductor, Inc.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <config.h>
@@ -309,8 +296,7 @@ setup_pll_func:
         ldr r0, =CCM_BASE_ADDR
         ldr r1, =0x00015154
         str r1, [r0, #CLKCTL_CBCMR]
-        ldr r1, =0x02888945
-        orr r1, r1, #(1 << 16)
+        ldr r1, =0x02898945
         str r1, [r0, #CLKCTL_CBCDR]
         /* make sure change is effective */
 1:      ldr r1, [r0, #CLKCTL_CDHIPR]
@@ -321,10 +307,7 @@ setup_pll_func:
 
 	/* Switch peripheral to PLL2 */
 	ldr r0, =CCM_BASE_ADDR
-	ldr r1, =0x00808145
-	orr r1, r1, #(2 << 10)
-	orr r1, r1, #(0 << 16)
-	orr r1, r1, #(1 << 19)
+	ldr r1, =0x00888945
 	str r1, [r0, #CLKCTL_CBCDR]
 
 	ldr r1, =0x00016154

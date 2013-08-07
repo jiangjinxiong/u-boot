@@ -4,20 +4,7 @@
  * Copyright (C) 2013 Otavio Salvador <otavio@ossystems.com.br>
  * on behalf of O.S. Systems Software LTDA.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
- *
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 #ifndef __MX23EVK_CONFIG_H__
 #define __MX23EVK_CONFIG_H__
@@ -33,8 +20,6 @@
 #define CONFIG_MACH_TYPE	MACH_TYPE_MX23EVK
 
 #define CONFIG_SYS_NO_FLASH
-#define CONFIG_SYS_ICACHE_OFF
-#define CONFIG_SYS_DCACHE_OFF
 #define CONFIG_BOARD_EARLY_INIT_F
 #define CONFIG_ARCH_MISC_INIT
 
@@ -60,7 +45,9 @@
 #define CONFIG_CMD_FAT
 #define CONFIG_CMD_GPIO
 #define CONFIG_CMD_MMC
+#define CONFIG_CMD_USB
 #define CONFIG_CMD_BOOTZ
+#define CONFIG_VIDEO
 
 /* Memory configurations */
 #define CONFIG_NR_DRAM_BANKS		1		/* 1 bank of DRAM */
@@ -112,7 +99,6 @@
 #define CONFIG_PL01x_PORTS		{ (void *)MXS_UARTDBG_BASE }
 #define CONFIG_CONS_INDEX		0
 #define CONFIG_BAUDRATE			115200	/* Default baud rate */
-#define CONFIG_SYS_BAUDRATE_TABLE	{ 9600, 19200, 38400, 57600, 115200 }
 
 /* DMA */
 #define CONFIG_APBH_DMA
@@ -123,6 +109,32 @@
 #define CONFIG_GENERIC_MMC
 #define CONFIG_BOUNCE_BUFFER
 #define CONFIG_MXS_MMC
+#endif
+
+/* USB */
+#ifdef	CONFIG_CMD_USB
+#define CONFIG_USB_EHCI
+#define CONFIG_USB_EHCI_MXS
+#define CONFIG_EHCI_MXS_PORT0
+#define CONFIG_USB_MAX_CONTROLLER_COUNT 1
+#define CONFIG_EHCI_IS_TDI
+#define CONFIG_USB_STORAGE
+#endif
+
+/* Framebuffer support */
+#ifdef CONFIG_VIDEO
+#define CONFIG_CFB_CONSOLE
+#define CONFIG_VIDEO_MXS
+#define CONFIG_VIDEO_LOGO
+#define CONFIG_VIDEO_SW_CURSOR
+#define CONFIG_VGA_AS_SINGLE_DEVICE
+#define CONFIG_SYS_CONSOLE_IS_IN_ENV
+#define CONFIG_SPLASH_SCREEN
+#define CONFIG_CMD_BMP
+#define CONFIG_BMP_16BPP
+#define CONFIG_VIDEO_BMP_RLE8
+#define CONFIG_VIDEO_BMP_GZIP
+#define CONFIG_SYS_VIDEO_LOGO_MAX_SIZE	(512 << 10)
 #endif
 
 /* Boot Linux */

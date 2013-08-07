@@ -2,23 +2,7 @@
  * (C) Copyright 2010-2011
  * NVIDIA Corporation <www.nvidia.com>
  *
- * See file CREDITS for list of people who contributed to this
- * project.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 #include <asm/types.h>
 
@@ -59,8 +43,25 @@
 extern void _start(void);
 
 /**
- * Works out the SOC type used for clocks settings
+ * Works out the SOC/SKU type used for clocks settings
  *
  * @return	SOC type - see TEGRA_SOC...
  */
-int tegra_get_chip_type(void);
+int tegra_get_chip_sku(void);
+
+/**
+ * Returns the pure SOC (chip ID) from the HIDREV register
+ *
+ * @return	SOC ID - see CHIPID_TEGRAxx...
+ */
+int tegra_get_chip(void);
+
+/**
+ * Returns the SKU ID from the sku_info register
+ *
+ * @return	SKU ID - see SKU_ID_Txx...
+ */
+int tegra_get_sku_info(void);
+
+/* Do any chip-specific cache config */
+void config_cache(void);

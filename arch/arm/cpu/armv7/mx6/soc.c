@@ -4,23 +4,7 @@
  *
  * (C) Copyright 2009 Freescale Semiconductor, Inc.
  *
- * See file CREDITS for list of people who contributed to this
- * project.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -30,6 +14,8 @@
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/imx-common/boot_mode.h>
+#include <asm/imx-common/dma.h>
+#include <stdbool.h>
 
 struct scu_regs {
 	u32	ctrl;
@@ -59,6 +45,18 @@ u32 get_cpu_rev(void)
 	reg &= 0xff;		/* mx6 silicon revision */
 	return (type << 12) | (reg + 0x10);
 }
+
+#ifdef CONFIG_REVISION_TAG
+u32 __weak get_board_rev(void)
+{
+	u32 cpurev = get_cpu_rev();
+	u32 type = ((cpurev >> 12) & 0xff);
+	if (type == MXC_CPU_MX6SOLO)
+		cpurev = (MXC_CPU_MX6DL) << 12 | (cpurev & 0xFFF);
+
+	return cpurev;
+}
+#endif
 
 void init_aips(void)
 {
@@ -121,11 +119,28 @@ void set_vddsoc(u32 mv)
 	writel(reg, &anatop->reg_core);
 }
 
+static void imx_set_wdog_powerdown(bool enable)
+{
+	struct wdog_regs *wdog1 = (struct wdog_regs *)WDOG1_BASE_ADDR;
+	struct wdog_regs *wdog2 = (struct wdog_regs *)WDOG2_BASE_ADDR;
+
+	/* Write to the PDE (Power Down Enable) bit */
+	writew(enable, &wdog1->wmcr);
+	writew(enable, &wdog2->wmcr);
+}
+
 int arch_cpu_init(void)
 {
 	init_aips();
 
 	set_vddsoc(1200);	/* Set VDDSOC to 1.2V */
+
+	imx_set_wdog_powerdown(false); /* Disable PDE bit of WMCR register */
+
+#ifdef CONFIG_APBH_DMA
+	/* Start APBH DMA */
+	mxs_dma_init();
+#endif
 
 	return 0;
 }
@@ -141,8 +156,8 @@ void enable_caches(void)
 #if defined(CONFIG_FEC_MXC)
 void imx_get_mac_from_fuse(int dev_id, unsigned char *mac)
 {
-	struct iim_regs *iim = (struct iim_regs *)IMX_IIM_BASE;
-	struct fuse_bank *bank = &iim->bank[4];
+	struct ocotp_regs *ocotp = (struct ocotp_regs *)OCOTP_BASE_ADDR;
+	struct fuse_bank *bank = &ocotp->bank[4];
 	struct fuse_bank4_regs *fuse =
 			(struct fuse_bank4_regs *)bank->fuse_regs;
 
@@ -193,3 +208,7 @@ const struct boot_mode soc_boot_modes[] = {
 	{"esdhc4",	MAKE_CFGVAL(0x40, 0x38, 0x00, 0x00)},
 	{NULL,		0},
 };
+
+void s_init(void)
+{
+}

@@ -3,23 +3,7 @@
  *
  * Copyright (C) 2013 Marek Vasut <marex@denx.de>
  *
- * See file CREDITS for list of people who contributed to this
- * project.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
@@ -29,8 +13,8 @@
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/sys_proto.h>
 
-#define	MUX_CONFIG_EMI	(MXS_PAD_3V3 | MXS_PAD_16MA | MXS_PAD_PULLUP)
-#define	MUX_CONFIG_SSP	(MXS_PAD_3V3 | MXS_PAD_8MA | MXS_PAD_PULLUP)
+#define	MUX_CONFIG_EMI	(MXS_PAD_3V3 | MXS_PAD_12MA | MXS_PAD_PULLUP)
+#define	MUX_CONFIG_SSP	(MXS_PAD_8MA | MXS_PAD_PULLUP)
 
 const iomux_cfg_t iomux_setup[] = {
 	/* DUART */
@@ -84,6 +68,10 @@ const iomux_cfg_t iomux_setup[] = {
 	MX23_PAD_EMI_RASN__EMI_RASN | MUX_CONFIG_EMI,
 	MX23_PAD_EMI_WEN__EMI_WEN | MUX_CONFIG_EMI,
 
+	/* Green LED */
+	MX23_PAD_SSP1_DETECT__GPIO_2_1 |
+		(MXS_PAD_3V3 | MXS_PAD_4MA | MXS_PAD_NOPULL),
+
 	/* MMC 0 */
 	MX23_PAD_SSP1_CMD__SSP1_CMD | MUX_CONFIG_SSP,
 	MX23_PAD_SSP1_DATA0__SSP1_DATA0 | MUX_CONFIG_SSP,
@@ -91,6 +79,10 @@ const iomux_cfg_t iomux_setup[] = {
 	MX23_PAD_SSP1_DATA2__SSP1_DATA2 | MUX_CONFIG_SSP,
 	MX23_PAD_SSP1_DATA3__SSP1_DATA3 | MUX_CONFIG_SSP,
 	MX23_PAD_SSP1_SCK__SSP1_SCK | MUX_CONFIG_SSP,
+
+	/* Ethernet */
+	MX23_PAD_GPMI_ALE__GPIO_0_17 |
+		(MXS_PAD_3V3 | MXS_PAD_12MA | MXS_PAD_NOPULL),
 };
 
 void board_init_ll(void)

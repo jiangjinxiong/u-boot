@@ -4,29 +4,14 @@
  * Copyright (C) 2011 Marek Vasut <marek.vasut@gmail.com>
  * on behalf of DENX Software Engineering GmbH
  *
- * See file CREDITS for list of people who contributed to this
- * project.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA 02111-1307 USA
+ * SPDX-License-Identifier:	GPL-2.0+
  */
 
 #include <common.h>
 #include <config.h>
 #include <asm/io.h>
 #include <asm/arch/imx-regs.h>
+#include <asm/arch/sys_proto.h>
 #include <linux/compiler.h>
 
 #include "mxs_init.h"
@@ -45,17 +30,17 @@ static uint32_t dram_vals[] = {
 	0x00000000, 0x00000000, 0x00010101, 0x01010101,
 	0x000f0f01, 0x0f02020a, 0x00000000, 0x00010101,
 	0x00000100, 0x00000100, 0x00000000, 0x00000002,
-	0x01010000, 0x05060302, 0x06005003, 0x0a0000c8,
-	0x02009c40, 0x0000030c, 0x0036a609, 0x031a0612,
+	0x01010000, 0x07080403, 0x06005003, 0x0a0000c8,
+	0x02009c40, 0x0002030c, 0x0036a609, 0x031a0612,
 	0x02030202, 0x00c8001c, 0x00000000, 0x00000000,
 	0x00012100, 0xffff0303, 0x00012100, 0xffff0303,
 	0x00012100, 0xffff0303, 0x00012100, 0xffff0303,
 	0x00000003, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000612, 0x01000F02,
-	0x06120612, 0x00000200, 0x00020007, 0xf5014b27,
-	0xf5014b27, 0xf5014b27, 0xf5014b27, 0x07000300,
-	0x07000300, 0x07000300, 0x07000300, 0x00000006,
+	0x06120612, 0x00000200, 0x00020007, 0xf4004a27,
+	0xf4004a27, 0xf4004a27, 0xf4004a27, 0x07000300,
+	0x07000300, 0x07400300, 0x07400300, 0x00000005,
 	0x00000000, 0x00000000, 0x01000000, 0x01020408,
 	0x08040201, 0x000f1133, 0x00000000, 0x00001f04,
 	0x00001f04, 0x00001f04, 0x00001f04, 0x00001f04,
@@ -76,14 +61,14 @@ static uint32_t dram_vals[] = {
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,
-	0x00000000, 0x00000000, 0x00010000, 0x00020304,
-	0x00000004, 0x00000000, 0x00000000, 0x00000000,
+	0x00000000, 0x00000000, 0x00010000, 0x00030404,
+	0x00000003, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x01010000,
 	0x01000000, 0x03030000, 0x00010303, 0x01020202,
 	0x00000000, 0x02040303, 0x21002103, 0x00061200,
-	0x06120612, 0x04320432, 0x04320432, 0x00040004,
+	0x06120612, 0x04420442, 0x04420442, 0x00040004,
 	0x00040004, 0x00000000, 0x00000000, 0x00000000,
-	0x00000000, 0x00010001
+	0x00000000, 0xffffffff
 
 /*
  * i.MX23 DDR at 133MHz
@@ -109,6 +94,7 @@ __weak void mxs_adjust_memory_params(uint32_t *dram_vals)
 {
 }
 
+#ifdef CONFIG_MX28
 static void initialize_dram_values(void)
 {
 	int i;
@@ -117,11 +103,36 @@ static void initialize_dram_values(void)
 
 	for (i = 0; i < ARRAY_SIZE(dram_vals); i++)
 		writel(dram_vals[i], MXS_DRAM_BASE + (4 * i));
-
-#ifdef CONFIG_MX23
-	writel((1 << 24), MXS_DRAM_BASE + (4 * 8));
-#endif
 }
+#else
+static void initialize_dram_values(void)
+{
+	int i;
+
+	mxs_adjust_memory_params(dram_vals);
+
+	/*
+	 * HW_DRAM_CTL27, HW_DRAM_CTL28 and HW_DRAM_CTL35 are not initialized as
+	 * per FSL bootlets code.
+	 *
+	 * mx23 Reference Manual marks HW_DRAM_CTL27 and HW_DRAM_CTL28 as
+	 * "reserved".
+	 * HW_DRAM_CTL8 is setup as the last element.
+	 * So skip the initialization of these HW_DRAM_CTL registers.
+	 */
+	for (i = 0; i < ARRAY_SIZE(dram_vals); i++) {
+		if (i == 8 || i == 27 || i == 28 || i == 35)
+			continue;
+		writel(dram_vals[i], MXS_DRAM_BASE + (4 * i));
+	}
+
+	/*
+	 * Enable tRAS lockout in HW_DRAM_CTL08 ; it must be the last
+	 * element to be set
+	 */
+	writel((1 << 24), MXS_DRAM_BASE + (4 * 8));
+}
+#endif
 
 static void mxs_mem_init_clock(void)
 {
@@ -229,21 +240,20 @@ static void mx23_mem_setup_vddmem(void)
 	struct mxs_power_regs *power_regs =
 		(struct mxs_power_regs *)MXS_POWER_BASE;
 
-	writel((0x12 << POWER_VDDMEMCTRL_TRG_OFFSET) |
-		POWER_VDDMEMCTRL_ENABLE_ILIMIT |
-		POWER_VDDMEMCTRL_ENABLE_LINREG |
-		POWER_VDDMEMCTRL_PULLDOWN_ACTIVE,
-		&power_regs->hw_power_vddmemctrl);
+	clrbits_le32(&power_regs->hw_power_vddmemctrl,
+		POWER_VDDMEMCTRL_ENABLE_ILIMIT);
 
-	early_delay(10000);
-
-	writel((0x12 << POWER_VDDMEMCTRL_TRG_OFFSET) |
-		POWER_VDDMEMCTRL_ENABLE_LINREG,
-		&power_regs->hw_power_vddmemctrl);
 }
 
 static void mx23_mem_init(void)
 {
+	/*
+	 * Reset/ungate the EMI block. This is essential, otherwise the system
+	 * suffers from memory instability. This thing is mx23 specific and is
+	 * no longer present on mx28.
+	 */
+	mxs_reset_block((struct mxs_register_32 *)MXS_EMI_BASE);
+
 	mx23_mem_setup_vddmem();
 
 	/*
@@ -255,22 +265,18 @@ static void mx23_mem_init(void)
 
 	initialize_dram_values();
 
-	/* Set START bit in DRAM_CTL16 */
+	/* Set START bit in DRAM_CTL8 */
 	setbits_le32(MXS_DRAM_BASE + 0x20, 1 << 16);
 
 	clrbits_le32(MXS_DRAM_BASE + 0x40, 1 << 17);
 	early_delay(20000);
 
 	/* Adjust EMI port priority. */
-	clrsetbits_le32(0x80020000, 0x1f << 16, 0x8);
+	clrsetbits_le32(0x80020000, 0x1f << 16, 0x2);
 	early_delay(20000);
 
 	setbits_le32(MXS_DRAM_BASE + 0x40, 1 << 19);
 	setbits_le32(MXS_DRAM_BASE + 0x40, 1 << 11);
-
-	/* Wait for bit 10 (DRAM init complete) in DRAM_CTL18 */
-	while (!(readl(MXS_DRAM_BASE + 0x48) & (1 << 10)))
-		;
 }
 #endif
 
