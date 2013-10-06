@@ -301,16 +301,8 @@
 	"nand erase.part rootfs2;"\
 	"nand write $loadaddr $rootfs2addr $filesize\0"\                
 "update_all=mmc rescan;nand scrub.chip;nand erase.chip;"\
-	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk01;nand write $loadaddr 20000 20000;"\
-	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk02;nand write $loadaddr 40000 20000;"\
- 	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk03;nand write $loadaddr 60000 20000;"\
-	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk04;nand write $loadaddr 80000 20000;"\
-	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk05;nand write $loadaddr A0000 20000;"\
-	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk17;nand write $loadaddr 220000 80000;"\
-	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk21;nand write $loadaddr 2A0000 80000;"\
-	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk25;nand write $loadaddr 320000 80000;"\
-	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk29;nand write $loadaddr 3A0000 80000;"\
-	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk33;nand write $loadaddr 420000 80000;"\
+	"fatload mmc 0 $loadaddr sd/ubl_nand/ubl_blk01;nand write $loadaddr 20000 $filesize;"\
+	"fatload mmc 0 $loadaddr sd/uboot_nand/uboot_blk25;nand write $loadaddr 320000 $filesize;"\
 	"fatload mmc 0 $loadaddr sd/uImage;nand write $loadaddr $kernel1addr $filesize;"\                                
 	"fatload mmc 0 $loadaddr sd/rootfs.cramfs;nand write $loadaddr $rootfs1addr $filesize\0"
 	                                            
