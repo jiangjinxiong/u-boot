@@ -35,7 +35,7 @@ Makefile have been tested to some extent and can be considered
 "working". In fact, many of them are used in production systems.
 
 In case of problems see the CHANGELOG and CREDITS files to find out
-who contributed the specific port. The MAINTAINERS file lists board
+who contributed the specific port. The boards.cfg file lists board
 maintainers.
 
 Note: There is no CHANGELOG file in the actual U-Boot source tree;
@@ -144,16 +144,12 @@ Directory Hierarchy:
       /arm1136		Files specific to ARM 1136 CPUs
       /ixp		Files specific to Intel XScale IXP CPUs
       /pxa		Files specific to Intel XScale PXA CPUs
-      /s3c44b0		Files specific to Samsung S3C44B0 CPUs
       /sa1100		Files specific to Intel StrongARM SA1100 CPUs
     /lib		Architecture specific library files
   /avr32		Files generic to AVR32 architecture
     /cpu		CPU specific files
     /lib		Architecture specific library files
   /blackfin		Files generic to Analog Devices Blackfin architecture
-    /cpu		CPU specific files
-    /lib		Architecture specific library files
-  /x86			Files generic to x86 architecture
     /cpu		CPU specific files
     /lib		Architecture specific library files
   /m68k			Files generic to m68k architecture
@@ -179,6 +175,9 @@ Directory Hierarchy:
   /nios2		Files generic to Altera NIOS2 architecture
     /cpu		CPU specific files
     /lib		Architecture specific library files
+  /openrisc		Files generic to OpenRISC architecture
+    /cpu		CPU specific files
+    /lib		Architecture specific library files
   /powerpc		Files generic to PowerPC architecture
     /cpu		CPU specific files
       /74xx_7xx		Files specific to Freescale MPC74xx and 7xx CPUs
@@ -201,12 +200,16 @@ Directory Hierarchy:
       /leon2		Files specific to Gaisler LEON2 SPARC CPU
       /leon3		Files specific to Gaisler LEON3 SPARC CPU
     /lib		Architecture specific library files
+  /x86			Files generic to x86 architecture
+    /cpu		CPU specific files
+    /lib		Architecture specific library files
 /api			Machine/arch independent API for external apps
 /board			Board dependent files
 /common			Misc architecture independent functions
 /disk			Code for disk drive partition handling
 /doc			Documentation (don't expect too much)
 /drivers		Commonly used device drivers
+/dts			Contains Makefile for building internal U-Boot fdt.
 /examples		Example code for standalone applications, etc.
 /fs			Filesystem code (cramfs, ext2, jffs2, etc.)
 /include		Header Files
@@ -216,7 +219,7 @@ Directory Hierarchy:
   /lzo			Library files to support LZO decompression
 /net			Networking code
 /post			Power On Self Test
-/rtc			Real Time Clock drivers
+/spl			Secondary Program Loader framework
 /tools			Tools to build S-Record or U-Boot images, etc.
 
 Software Configuration:
@@ -1405,6 +1408,12 @@ The following options need to be configured:
 		CONFIG_DFU_NAND
 		This enables support for exposing NAND devices via DFU.
 
+		CONFIG_DFU_RAM
+		This enables support for exposing RAM via DFU.
+		Note: DFU spec refer to non-volatile memory usage, but
+		allow usages beyond the scope of spec - here RAM usage,
+		one that would help mostly the developer.
+
 		CONFIG_SYS_DFU_DATA_BUF_SIZE
 		Dfu transfer uses a buffer before writing data to the
 		raw storage device. Make the size (in bytes) of this buffer
@@ -1680,6 +1689,10 @@ CBFS (Coreboot Filesystem) support
 		to compress the specified memory at its best effort.
 
 - Compression support:
+		CONFIG_GZIP
+
+		Enabled by default to support gzip compressed images.
+
 		CONFIG_BZIP2
 
 		If this option is set, support for bzip2 compressed
@@ -1712,6 +1725,11 @@ CBFS (Coreboot Filesystem) support
 		Use the lzmainfo tool to determinate the lc and lp values and
 		then calculate the amount of needed dynamic memory (ensuring
 		the appropriate CONFIG_SYS_MALLOC_LEN value).
+
+		CONFIG_LZO
+
+		If this option is set, support for LZO compressed images
+		is included.
 
 - MII/PHY support:
 		CONFIG_PHY_ADDR
@@ -3351,7 +3369,7 @@ Configuration Settings:
 		the Linux kernel; all data that must be processed by
 		the Linux kernel (bd_info, boot arguments, FDT blob if
 		used) must be put below this limit, unless "bootm_low"
-		enviroment variable is defined and non-zero. In such case
+		environment variable is defined and non-zero. In such case
 		all data for the Linux kernel must be between "bootm_low"
 		and "bootm_low" + CONFIG_SYS_BOOTMAPSZ.	 The environment
 		variable "bootm_mapsize" will override the value of
@@ -3464,7 +3482,7 @@ Configuration Settings:
 
 - CONFIG_ENV_FLAGS_LIST_DEFAULT
 - CONFIG_ENV_FLAGS_LIST_STATIC
-	Enable validation of the values given to enviroment variables when
+	Enable validation of the values given to environment variables when
 	calling env set.  Variables can be restricted to only decimal,
 	hexadecimal, or boolean.  If CONFIG_CMD_NET is also defined,
 	the variables can also be restricted to IP address or MAC address.
@@ -5579,15 +5597,17 @@ On ARM, the following registers are used:
 
 	R0:	function argument word/integer result
 	R1-R3:	function argument word
-	R9:	GOT pointer
-	R10:	stack limit (used only if stack checking if enabled)
+	R9:	platform specific
+	R10:	stack limit (used only if stack checking is enabled)
 	R11:	argument (frame) pointer
 	R12:	temporary workspace
 	R13:	stack pointer
 	R14:	link register
 	R15:	program counter
 
-    ==> U-Boot will use R8 to hold a pointer to the global data
+    ==> U-Boot will use R9 to hold a pointer to the global data
+
+    Note: on ARM, only R_ARM_RELATIVE relocations are supported.
 
 On Nios II, the ABI is documented here:
 	http://www.altera.com/literature/hb/nios2/n2cpu_nii51016.pdf
@@ -5824,8 +5844,8 @@ it:
 
 * For major contributions, your entry to the CREDITS file
 
-* When you add support for a new board, don't forget to add this
-  board to the MAINTAINERS file, too.
+* When you add support for a new board, don't forget to add a
+  maintainer e-mail address to the boards.cfg file, too.
 
 * If your patch adds new configuration options, don't forget to
   document these in the README file.

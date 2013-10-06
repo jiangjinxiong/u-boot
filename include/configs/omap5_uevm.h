@@ -17,6 +17,8 @@
 	"uuid_disk=${uuid_gpt_disk};" \
 	"name=rootfs,start=2MiB,size=-,uuid=${uuid_gpt_rootfs}"
 
+#include <configs/omap5_common.h>
+
 #define CONFIG_CONS_INDEX		3
 #define CONFIG_SYS_NS16550_COM3		UART3_BASE
 #define CONFIG_BAUDRATE			115200
@@ -35,14 +37,36 @@
 #define CONFIG_PARTITION_UUIDS
 #define CONFIG_CMD_PART
 
+/* Required support for the TCA642X GPIO we have on the uEVM */
 #define CONFIG_TCA642X
 #define CONFIG_CMD_TCA642X
 #define CONFIG_SYS_I2C_TCA642X_BUS_NUM 4
 #define CONFIG_SYS_I2C_TCA642X_ADDR 0x22
 
-#define CONSOLEDEV		"ttyO2"
-#define CONFIG_OMAP_PLATFORM_RESET_TIME_MAX_USEC	16296
+/* USB UHH support options */
+#define CONFIG_CMD_USB
+#define CONFIG_USB_HOST
+#define CONFIG_USB_EHCI
+#define CONFIG_USB_EHCI_OMAP
+#define CONFIG_USB_STORAGE
+#define CONFIG_SYS_USB_EHCI_MAX_ROOT_PORTS 3
+#define CONFIG_EHCI_HCD_INIT_AFTER_RESET
 
-#include <configs/omap5_common.h>
+#define CONFIG_OMAP_EHCI_PHY2_RESET_GPIO 80
+#define CONFIG_OMAP_EHCI_PHY3_RESET_GPIO 79
+
+/* Enabled commands */
+#define CONFIG_CMD_DHCP		/* DHCP Support			*/
+#define CONFIG_CMD_NET		/* bootp, tftpboot, rarpboot	*/
+#define CONFIG_CMD_NFS		/* NFS support			*/
+
+/* USB Networking options */
+#define CONFIG_USB_HOST_ETHER
+#define CONFIG_USB_ETHER_SMSC95XX
+
+#define CONSOLEDEV		"ttyO2"
+
+/* Max time to hold reset on this board, see doc/README.omap-reset-time */
+#define CONFIG_OMAP_PLATFORM_RESET_TIME_MAX_USEC	16296
 
 #endif /* __CONFIG_OMAP5_EVM_H */
