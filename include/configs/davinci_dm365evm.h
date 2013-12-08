@@ -7,7 +7,7 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#define CONFIG_HOSTNAME		TFC_IPNC
+#define CONFIG_HOSTNAME		JIANGJX_IPNC
 
 /* Spectrum Digital TMS320DM365 EVM board */
 #define DAVINCI_DM365EVM
